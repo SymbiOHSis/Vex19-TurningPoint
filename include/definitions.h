@@ -2,10 +2,10 @@
 #define _DEFINITIONS_H_
 
 // Motors
-#define DRIVE_LEFT_FRONT    1
-#define DRIVE_LEFT_BACK     2
-#define DRIVE_RIGHT_FRONT   3
-#define DRIVE_RIGHT_BACK    4
+#define DRIVE_LEFT_FRONT    5
+#define DRIVE_LEFT_BACK     15
+#define DRIVE_RIGHT_FRONT   -6
+#define DRIVE_RIGHT_BACK    -16
 
 // Sensors
 
