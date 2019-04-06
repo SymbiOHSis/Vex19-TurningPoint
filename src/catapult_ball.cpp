@@ -1,16 +1,16 @@
 #include "main.h"
 
-Motor catapult (CATAPULT);
-Motor ballIntake (BALL_INTAKE);
-pros::ADIAnalogIn ballDetector (BALL_DETECTOR);
-pros::ADIPotentiometer catapultPot (CATAPULT_POT);
+static Motor catapult (CATAPULT);
+static Motor ballIntake (BALL_INTAKE);
+static pros::ADIAnalogIn ballDetector (BALL_DETECTOR);
+static pros::ADIPotentiometer catapultPot (CATAPULT_POT);
 
-bool ballLoaded = true;
-bool ballIntakeActive = false;
-bool ballIntakeReversed = false;
-uint32_t feedingUntil = 0;
-bool catapultActive = false;
-bool catapultFiring = false;
+static bool ballLoaded = true;
+static bool ballIntakeActive = false;
+static bool ballIntakeReversed = false;
+static uint32_t feedingUntil = 0;
+static bool catapultActive = false;
+static bool catapultFiring = false;
 
 bool ballIsDetected() {
     return ballDetector.get_value() < BALL_DETECTOR_THRESHOLD;
@@ -54,6 +54,7 @@ void catapultManager() {
         // finished firing
         if (catapultFiring && !catapultIsDown()) {
             catapultFiring = false;
+            ballLoaded = false;
         }
         // hold catapult down
         else if (!catapultFiring && catapultIsDown()) {
@@ -87,11 +88,12 @@ void ballIntakeManager() {
             
             // if we detect a ball
             else if (ballIsDetected()) {
-                // if catapult is down, feed ball
-                if (catapultIsDown()) {
+                // if catapult is down (and no ball loaded), feed ball
+                if (catapultIsDown() && !ballLoaded) {
                     startBallIntake();
+                    ballLoaded = true;
                 }
-                // if catapult is up, stop intake
+                // if catapult is up or ball is already loaded, stop intake
                 else {
                     ballIntake.moveVoltage(0);
                 }

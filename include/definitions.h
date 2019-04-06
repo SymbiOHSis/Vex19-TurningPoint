@@ -14,7 +14,7 @@
 
 // Ball & Catapult
 #define BALL_INTAKE             15
-#define BALL_INTAKE_SPEED       80  // range -1 < x < 1
+#define BALL_INTAKE_SPEED       0.8 // range -1 <= x <= 1
 #define BALL_DETECTOR           0
 #define BALL_DETECTOR_THRESHOLD 0
 #define BALL_FEED_TIME          0
@@ -23,12 +23,12 @@
 #define CATAPULT_POT            0
 #define CATAPULT_POT_THRESHOLD  0
 #define CATAPULT_LOAD           0
-#define CATAPULT_HOLD_SPEED     0   // range -1 < x < 1
-#define CATAPULT_SPEED          80  // range -1 < x < 1
+#define CATAPULT_HOLD_SPEED     0   // range -1 <= x <= 1
+#define CATAPULT_SPEED          0.8 // range -1 <= x <= 1
 
 // Cap Flipper
 #define FLIPPER                 14
-#define FLIPPER_SPEED           80  // range -1 < x < 1
+#define FLIPPER_SPEED           0.8 // range -1 <= x <= 1
 
 // Cap Descorer
 #define DESCORER                0
