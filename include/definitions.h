@@ -31,4 +31,4 @@
 #define FLIPPER_SPEED           0.8 // range -1 <= x <= 1
 
 // Cap Descorer
-#define DESCORER                0
+#define DESCORER                12

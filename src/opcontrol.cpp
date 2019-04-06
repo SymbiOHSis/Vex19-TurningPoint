@@ -64,7 +64,7 @@ void opcontrol() {
 		}
 
 		/* DESCORER */
-		setDescorerManual((int) ctl.getDigital(okapi::ControllerDigital::R1) - (int) ctl.getDigital(okapi::ControllerDigital::R2));
+		setDescorerManual(ctl.getDigital(okapi::ControllerDigital::R1) - ctl.getDigital(okapi::ControllerDigital::R2));
 
 		// loop at 100Hz
 		pros::delay(10);
