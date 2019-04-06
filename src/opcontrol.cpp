@@ -27,8 +27,41 @@ void opcontrol() {
 		                 (pros::lcd::read_buttons() & LCD_BTN_CENTER) >> 1,
 		                 (pros::lcd::read_buttons() & LCD_BTN_RIGHT) >> 0);
 		
-		drive.arcade(ctl.getAnalog(okapi::ControllerAnalog::leftY), ctl.getAnalog(okapi::ControllerAnalog::leftX), CONTROLLER_THRESHOLD);
+		/* DRIVE */
+		drive.arcade(
+			ctl.getAnalog(okapi::ControllerAnalog::leftY),
+			ctl.getAnalog(okapi::ControllerAnalog::leftX),
+			CONTROLLER_THRESHOLD
+		);
 
-		pros::delay(20);
+		/* BALL & CATAPULT */
+		if (ctl.getDigital(okapi::ControllerDigital::B)) {
+			startBallIntake();
+		}
+		else if (ctl.getDigital(okapi::ControllerDigital::L1)) {
+			stopBallIntake();
+		}
+		else if (ctl.getDigital(okapi::ControllerDigital::L2)) {
+			reverseBallIntake();
+		}
+		if (ctl.getDigital(okapi::ControllerDigital::A)) {
+			fireCatapult();
+		}
+		ballIntakeManager();
+		catapultManager();
+
+		/* FLIPPER */
+		if (abs(ctl.getAnalog(okapi::ControllerAnalog::rightY)) > CONTROLLER_THRESHOLD) {
+			setFlipperManual(ctl.getAnalog(okapi::ControllerAnalog::rightY));
+		}
+		else {
+			setFlipperManual(0);
+		}
+
+		/* DESCORER */
+		setDescorerManual(ctl.getDigital(okapi::ControllerDigital::R1) - ctl.getDigital(okapi::ControllerDigital::R2));
+
+		// loop at 100Hz
+		pros::delay(10);
 	}
 }

@@ -34,14 +34,17 @@
  */
 //#define PROS_USE_LITERALS
 
-#include "api.h"
-
 /**
  * You should add more #includes here
  */
+#include "api.h"
 #include "okapi/api.hpp"
-#include "definitions.h"
 //#include "pros/api_legacy.h"
+
+#include "definitions.h"
+#include "catapult_ball.h"
+#include "flipper.h"
+#include "descorer.h"
 
 /**
  * If you find doing pros::Motor() to be tedious and you'd prefer just to do
