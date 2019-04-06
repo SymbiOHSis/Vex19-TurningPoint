@@ -19,9 +19,9 @@
 #define BALL_DETECTOR_THRESHOLD 0
 #define BALL_FEED_TIME          0
 
-#define CATAPULT                13
+#define CATAPULT                -13
 #define CATAPULT_POT            0
-#define CATAPULT_POT_THRESHOLD  0
+#define CATAPULT_POT_THRESHOLD  99999
 #define CATAPULT_LOAD           0
 #define CATAPULT_HOLD_SPEED     0   // range -1 <= x <= 1
 #define CATAPULT_SPEED          0.8 // range -1 <= x <= 1

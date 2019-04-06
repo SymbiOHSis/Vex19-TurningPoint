@@ -1,8 +1,8 @@
 #pragma once
 
-void startBallIntake();
-void reverseBallIntake();
-void stopBallIntake();
+void startAutomaticBallIntake(bool forceFeed = true);
+void stopAutomaticBallIntake();
+bool automaticBallIntakeIsActive();
 void fireCatapult();
 void stopCatapult();
 void catapultManager();

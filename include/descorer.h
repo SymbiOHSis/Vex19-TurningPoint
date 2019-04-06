@@ -1,3 +1,3 @@
 #pragma once
 
-void setDescorerManual(int speed);
+void setDescorerManual(float speed);

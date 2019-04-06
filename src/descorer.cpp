@@ -2,6 +2,6 @@
 
 static Motor descorer (DESCORER);
 
-void setDescorerManual(int speed) {
+void setDescorerManual(float speed) {
     descorer.moveVoltage(speed * 12000);
 }

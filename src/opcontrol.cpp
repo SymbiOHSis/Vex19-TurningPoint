@@ -22,6 +22,7 @@ void opcontrol() {
 	);
 
 	Controller ctl;
+	Motor catapult (CATAPULT);
 	while (true) {
 		debug();
 		
@@ -33,15 +34,21 @@ void opcontrol() {
 		);
 
 		/* BALL & CATAPULT */
-		if (ctl.getDigital(okapi::ControllerDigital::B)) {
-			startBallIntake();
+		if (ctl.getDigital(okapi::ControllerDigital::X)) {
+			startAutomaticBallIntake();
 		}
 		else if (ctl.getDigital(okapi::ControllerDigital::L1)) {
-			stopBallIntake();
+			stopAutomaticBallIntake();
+			catapult.moveVelocity(BALL_INTAKE_SPEED * 12000);
 		}
 		else if (ctl.getDigital(okapi::ControllerDigital::L2)) {
-			reverseBallIntake();
+			stopAutomaticBallIntake();
+			catapult.moveVelocity(BALL_INTAKE_SPEED * 12000);
 		}
+		else if (!automaticBallIntakeIsActive()) {
+			startAutomaticBallIntake(false);
+		}
+
 		if (ctl.getDigital(okapi::ControllerDigital::A)) {
 			fireCatapult();
 		}
@@ -57,7 +64,7 @@ void opcontrol() {
 		}
 
 		/* DESCORER */
-		setDescorerManual(ctl.getDigital(okapi::ControllerDigital::R1) - ctl.getDigital(okapi::ControllerDigital::R2));
+		setDescorerManual((int) ctl.getDigital(okapi::ControllerDigital::R1) - (int) ctl.getDigital(okapi::ControllerDigital::R2));
 
 		// loop at 100Hz
 		pros::delay(10);

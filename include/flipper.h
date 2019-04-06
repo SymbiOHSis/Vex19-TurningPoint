@@ -1,3 +1,3 @@
 #pragma once
 
-void setFlipperManual(int speed);
+void setFlipperManual(float speed);
