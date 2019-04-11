@@ -1,6 +1,6 @@
 #include "main.h"
 
-static Motor descorer (DESCORER);
+static okapi::Motor descorer (DESCORER);
 
 void setDescorerManual(float speed) {
     descorer.moveVoltage(speed * 12000);

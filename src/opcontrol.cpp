@@ -14,18 +14,22 @@
  * task, not resume it from where it left off.
  */
 void opcontrol() {
-	auto drive = ChassisControllerFactory::create(
+	auto drive = okapi::ChassisControllerFactory::create(
 		{ DRIVE_LEFT_FRONT,  DRIVE_LEFT_BACK  },
 		{ DRIVE_RIGHT_FRONT, DRIVE_RIGHT_BACK },
-		AbstractMotor::gearset::green,
+		okapi::AbstractMotor::gearset::green,
 		{ WHEEL_DIAMETER, CHASSIS_WIDTH }
 	);
 
-	Controller ctl;
-	Motor catapult (CATAPULT);
+	okapi::Controller ctl;
+	okapi::Motor catapult (CATAPULT);
+	pros::ADILineSensor ballDetector (BALL_DETECTOR);
+	pros::ADIPotentiometer catapultPot (CATAPULT_POT);
+
 	while (true) {
-		debug();
-		
+		pros::lcd::print(0, "ballDetector: %d\n", ballDetector.get_value());
+		pros::lcd::print(1, "catapultPot: %d\n", catapultPot.get_value());
+
 		/* DRIVE */
 		drive.arcade(
 			ctl.getAnalog(okapi::ControllerAnalog::leftY),
