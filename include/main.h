@@ -42,9 +42,11 @@
 //#include "pros/api_legacy.h"
 
 #include "constants.h"
-#include "catapult_ball.h"
+#include "catapult.h"
+#include "ballIntake.h"
 #include "flipper.h"
 #include "descorer.h"
+#include "debug.h"
 
 /**
  * If you find doing pros::Motor() to be tedious and you'd prefer just to do

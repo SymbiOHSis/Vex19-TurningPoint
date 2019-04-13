@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Descorer {
+namespace BallIntake {
     extern okapi::Motor motor;
     
     void initialize();
@@ -14,6 +14,12 @@ namespace Descorer {
     void debug();
 
     double getPosition();
+
+    void ballLoadedAtStartOfAuton(bool _ballLoaded = true);
+
+    bool ballIsLoaded();
+
+    void loadBall();
 
     void run(void* param);
 }

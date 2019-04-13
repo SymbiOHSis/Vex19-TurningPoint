@@ -1,7 +1,8 @@
 #pragma once
 
-namespace Descorer {
+namespace Catapult {
     extern okapi::Motor motor;
+    extern pros::ADIPotentiometer pot;
     
     void initialize();
     
@@ -14,6 +15,12 @@ namespace Descorer {
     void debug();
 
     double getPosition();
+
+    void fireAndReset();
+
+    void fire();
+
+    void reset();
 
     void run(void* param);
 }

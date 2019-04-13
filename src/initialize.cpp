@@ -8,10 +8,11 @@
  */
 void initialize() {
 	pros::lcd::initialize();
-
-#if DEBUG > 0
-	pros::lcd::print(0, "Debug level: %d\n", DEBUG);
-#endif
+	Catapult::initialize();
+	BallIntake::initialize();
+	Flipper::initialize();
+	Descorer::initialize();
+	Debug::initialize();
 }
 
 /**

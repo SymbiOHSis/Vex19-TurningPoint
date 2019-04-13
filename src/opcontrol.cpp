@@ -22,53 +22,63 @@ void opcontrol() {
 	);
 
 	okapi::Controller ctl;
-	okapi::Motor catapult (CATAPULT);
-	pros::ADILineSensor ballDetector (BALL_DETECTOR);
-	pros::ADIPotentiometer catapultPot (CATAPULT_POT);
+
+	Flipper::stop();
+	Descorer::stop();
+	Debug::start();
 
 	while (true) {
-		pros::lcd::print(0, "ballDetector: %d\n", ballDetector.get_value());
-		pros::lcd::print(1, "catapultPot: %d\n", catapultPot.get_value());
-
 		/* DRIVE */
-		drive.arcade(
+		drive.arcade( 
 			ctl.getAnalog(okapi::ControllerAnalog::leftY),
 			ctl.getAnalog(okapi::ControllerAnalog::leftX),
 			CONTROLLER_THRESHOLD
 		);
-
-		/* BALL & CATAPULT */
+		
+		/* CATAPULT */
+		// stop/relax catapult
 		if (ctl.getDigital(okapi::ControllerDigital::X)) {
-			startAutomaticBallIntake();
+			Catapult::stop();
 		}
-		else if (ctl.getDigital(okapi::ControllerDigital::L1)) {
-			stopAutomaticBallIntake();
-			catapult.moveVelocity(BALL_INTAKE_SPEED * 12000);
-		}
-		else if (ctl.getDigital(okapi::ControllerDigital::L2)) {
-			stopAutomaticBallIntake();
-			catapult.moveVelocity(BALL_INTAKE_SPEED * 12000);
-		}
-		else if (!automaticBallIntakeIsActive()) {
-			startAutomaticBallIntake(false);
+		// fire and reset catapult
+		else if (ctl.getDigital(okapi::ControllerDigital::A)) {
+			Catapult::fireAndReset();
 		}
 
-		if (ctl.getDigital(okapi::ControllerDigital::A)) {
-			fireCatapult();
+		/* BALL INTAKE */
+		// L1 to stop
+		if (ctl.getDigital(okapi::ControllerDigital::L1)) {
+			BallIntake::stop();
 		}
-		ballIntakeManager();
-		catapultManager();
+		// L2 to reverse
+		else if (ctl.getDigital(okapi::ControllerDigital::L2)) {
+			BallIntake::stop();
+			BallIntake::motor.moveVoltage(12000 * -BALL_INTAKE_SPEED);
+		}
+		// B to force feed/load
+		else if (ctl.getDigital(okapi::ControllerDigital::L2)) {
+			BallIntake::loadBall();
+		}
+		// otherwise automatic control
+		else if (ctl.getDigital(okapi::ControllerDigital::L2)) {
+			BallIntake::stop();
+		}
 
 		/* FLIPPER */
-		if (abs(ctl.getAnalog(okapi::ControllerAnalog::rightY)) > CONTROLLER_THRESHOLD) {
-			setFlipperManual(ctl.getAnalog(okapi::ControllerAnalog::rightY));
+		float rightY = ctl.getAnalog(okapi::ControllerAnalog::rightY);
+		if (abs(rightY) > CONTROLLER_THRESHOLD) {
+			Flipper::motor.moveVoltage(rightY * 12000);
 		}
 		else {
-			setFlipperManual(0);
+			Flipper::motor.moveVoltage(0);
 		}
 
 		/* DESCORER */
-		setDescorerManual(ctl.getDigital(okapi::ControllerDigital::R1) - ctl.getDigital(okapi::ControllerDigital::R2));
+		int direction = ctl.getDigital(okapi::ControllerDigital::R1) - ctl.getDigital(okapi::ControllerDigital::R2);
+		Descorer::motor.moveVoltage(direction * 12000 * DESCORER_SPEED);
+
+		/* DEBUG */
+		// already started
 
 		// loop at 100Hz
 		pros::delay(10);
