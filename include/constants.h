@@ -21,7 +21,7 @@
 
 // Catapult
 #define CATAPULT                -13
-#define CATAPULT_POT            0
+#define CATAPULT_POT            'A'
 #define CATAPULT_POT_THRESHOLD  99999
 #define CATAPULT_UP             99999
 #define CATAPULT_LOAD           0
