@@ -36,6 +36,9 @@ namespace Catapult {
         pros::lcd::print(1, "Motor Position: %.2f\n", motor.getPosition());
         pros::lcd::print(2, "Motor Temp: %d\n", motor.getTemperature());
         pros::lcd::print(3, "Pot Position: %d\n", pot.get_value());
+        pros::lcd::print(4, "\n");
+        pros::lcd::print(5, "\n");
+        pros::lcd::print(6, "\n");
     }
 
     double getPosition() {
