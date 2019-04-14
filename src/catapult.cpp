@@ -32,9 +32,19 @@ namespace Catapult {
     }
 
     void debug() {
-        pros::lcd::print(0, "Motor Voltage: %.2fV\n", motor.getVoltage() / 1000.0);
-        pros::lcd::print(1, "Motor Position: %.2f\n", motor.getPosition());
-        pros::lcd::print(2, "Motor Temp: %d\n", motor.getTemperature());
+        if (int v = motor.getVoltage() != PROS_ERR) {
+            pros::lcd::print(0, "Motor Voltage: %.2fV\n", v / 1000.0);
+        }
+        else {
+            pros::lcd::print(0, "Error fetching voltage, errno: %d", errno);
+        }
+        if (double p = motor.getPosition() != PROS_ERR) {
+            pros::lcd::print(1, "Motor Position: %.2f\n", p);
+        }
+        else {
+            pros::lcd::print(1, "Error fetching position, errno: %d", errno);
+        }
+        pros::lcd::print(2, "Motor Temp: %.0f\n", motor.getTemperature());
         pros::lcd::print(3, "Pot Position: %d\n", pot.get_value());
         pros::lcd::print(4, "\n");
         pros::lcd::print(5, "\n");
