@@ -46,6 +46,7 @@ namespace BallIntake {
 
     void loadBall() {
         loadingUntil = pros::millis() + BALL_FEED_TIME;
+        start();
     }
 
     void run(void* param) {
