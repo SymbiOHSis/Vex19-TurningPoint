@@ -1,12 +1,9 @@
 #include "main.h"
 
  namespace Flipper {
+    pros::Task task (run);
     bool active = false;
     okapi::Motor motor (FLIPPER);
-
-    void initialize() {
-        pros::Task task (run);
-    }
 
     void start() {
         active = true;
@@ -22,9 +19,30 @@
     }
 
     void debug() {
-        pros::lcd::print(0, "Motor Voltage: %.2fV\n", motor.getVoltage() / 1000.0);
-        pros::lcd::print(1, "Motor Position: %.2f\n", motor.getPosition());
-        pros::lcd::print(2, "Motor Temp: %.0f\n", motor.getTemperature());
+        // Motor Voltage
+        int32_t voltage = motor.getVoltage();
+        if (voltage != PROS_ERR_F) {
+            pros::lcd::print(0, "Motor Voltage: %.2fV\n", voltage / 1000.0);
+        }
+        else {
+            pros::lcd::print(0, "Error fetching motor voltage, errno: %d", errno);
+        }
+        // Motor Position
+        double position = motor.getPosition();
+        if (position != PROS_ERR_F) {
+            pros::lcd::print(1, "Motor Position: %.1f\n", position);
+        }
+        else {
+            pros::lcd::print(1, "Error fetching motor position, errno: %d", errno);
+        }
+        // Motor Temperature
+        double temperature = motor.getTemperature();
+        if (temperature != PROS_ERR_F) {
+            pros::lcd::print(2, "Motor Temp: %.0fC\n", temperature);
+        }
+        else {
+            pros::lcd::print(2, "Error fetching motor temp, errno: %d", errno);
+        }
         pros::lcd::print(3, "\n");
         pros::lcd::print(4, "\n");
         pros::lcd::print(5, "\n");

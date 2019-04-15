@@ -8,10 +8,6 @@
  */
 void initialize() {
 	pros::lcd::initialize();
-	Catapult::initialize();
-	BallIntake::initialize();
-	Flipper::initialize();
-	Descorer::initialize();
 	Debug::initialize();
 }
 

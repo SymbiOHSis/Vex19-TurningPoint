@@ -58,12 +58,14 @@ void opcontrol() {
 			BallIntake::motor.moveVoltage(12000 * -BALL_INTAKE_SPEED);
 		}
 		// B to force feed/load
-		else if (ctl.getDigital(okapi::ControllerDigital::L2)) {
+		else if (ctl.getDigital(okapi::ControllerDigital::B)) {
 			BallIntake::loadBall();
 		}
 		// otherwise automatic control
 		else {
-			BallIntake::start();
+			if (!BallIntake::isActive()) {
+				BallIntake::start();
+			}
 		}
 
 		/* FLIPPER */

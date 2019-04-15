@@ -4,8 +4,6 @@ namespace Catapult {
     extern okapi::Motor motor;
     extern pros::ADIPotentiometer pot;
     
-    void initialize();
-    
     void start();
 
     void stop();

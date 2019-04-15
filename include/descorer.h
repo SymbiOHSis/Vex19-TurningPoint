@@ -3,8 +3,6 @@
 namespace Descorer {
     extern okapi::Motor motor;
     
-    void initialize();
-    
     void start();
 
     void stop();

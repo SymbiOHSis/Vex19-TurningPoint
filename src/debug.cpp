@@ -37,19 +37,19 @@
             switch (debug % 4) {
 				case 0:
 					Catapult::debug();
-					pros::lcd::print(7, "  <<<<<   Debugging: Catapult   >>>>>  \n");
+					pros::lcd::print(7, "  <<<<<    Debugging:  Catapult    >>>>>  \n");
 					break;
 				case 1:
 					BallIntake::debug();
-					pros::lcd::print(7, "  <<<<<   Debugging: BallIntake >>>>>  \n");
+					pros::lcd::print(7, "  <<<<<    Debugging:  BallIntake  >>>>>  \n");
 					break;
 				case 2:
 					Flipper::debug();
-					pros::lcd::print(7, "  <<<<<   Debugging: Flipper    >>>>>  \n");
+					pros::lcd::print(7, "  <<<<<    Debugging:  Flipper     >>>>>  \n");
 					break;
 				case 3:
 					Descorer::debug();
-					pros::lcd::print(7, "  <<<<<   Debugging: Descorer   >>>>>  \n");
+					pros::lcd::print(7, "  <<<<<    Debugging:  Descorer    >>>>>  \n");
 					break;
 			}
         }

@@ -3,8 +3,6 @@
 namespace Flipper {
     extern okapi::Motor motor;
     
-    void initialize();
-    
     void start();
 
     void stop();

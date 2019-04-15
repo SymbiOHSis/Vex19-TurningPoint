@@ -1,18 +1,16 @@
 #include "main.h"
 
 namespace BallIntake {
+    pros::Task task (run);
     bool active = false;
     bool ballLoaded = true;
     uint32_t loadingUntil = 0;
     okapi::Motor motor (BALL_INTAKE);
 	pros::ADILineSensor ballDetector (BALL_DETECTOR);
 
-    void initialize() {
-        pros::Task task (run);
-    }
-
     void start() {
         active = true;
+        motor.moveVoltage(12000 * BALL_INTAKE_SPEED);
     }
 
     void stop() {
@@ -25,9 +23,30 @@ namespace BallIntake {
     }
 
     void debug() {
-        pros::lcd::print(0, "Motor Voltage: %.2fV\n", motor.getVoltage() / 1000.0);
-        pros::lcd::print(1, "Motor Position: %.2f\n", motor.getPosition());
-        pros::lcd::print(2, "Motor Temp: %.0f\n", motor.getTemperature());
+        // Motor Voltage
+        int32_t voltage = motor.getVoltage();
+        if (voltage != PROS_ERR_F) {
+            pros::lcd::print(0, "Motor Voltage: %.2fV\n", voltage / 1000.0);
+        }
+        else {
+            pros::lcd::print(0, "Error fetching motor voltage, errno: %d", errno);
+        }
+        // Motor Position
+        double position = motor.getPosition();
+        if (position != PROS_ERR_F) {
+            pros::lcd::print(1, "Motor Position: %.1f\n", position);
+        }
+        else {
+            pros::lcd::print(1, "Error fetching motor position, errno: %d", errno);
+        }
+        // Motor Temperature
+        double temperature = motor.getTemperature();
+        if (temperature != PROS_ERR_F) {
+            pros::lcd::print(2, "Motor Temp: %.0fC\n", temperature);
+        }
+        else {
+            pros::lcd::print(2, "Error fetching motor temp, errno: %d", errno);
+        }
         pros::lcd::print(3, "\n");
         pros::lcd::print(4, "\n");
         pros::lcd::print(5, "\n");
@@ -64,14 +83,14 @@ namespace BallIntake {
             if (!active) continue;
 
             // catapult is up, assume no ball
-            if (Catapult::getPosition() > CATAPULT_LOAD + CATAPULT_POT_THRESHOLD) {
+            if (Catapult::getPosition() > CATAPULT_LOAD) {
                 ballLoaded = false;
             }
 
             // ball is detected by sensor
             if (ballDetected()) {
                 // catapult is up, stop intake
-                if (Catapult::getPosition() > CATAPULT_LOAD + CATAPULT_POT_THRESHOLD) {
+                if (Catapult::getPosition() > CATAPULT_LOAD) {
                     motor.moveVoltage(0);
                 }
                 else {
