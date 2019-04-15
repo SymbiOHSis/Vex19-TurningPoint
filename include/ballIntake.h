@@ -17,6 +17,8 @@ namespace BallIntake {
 
     bool ballIsLoaded();
 
+    bool ballDetected();
+
     void loadBall();
 
     void run(void* param);

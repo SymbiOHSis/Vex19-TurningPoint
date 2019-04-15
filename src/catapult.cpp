@@ -31,7 +31,7 @@ namespace Catapult {
     void debug() {
         // Motor Voltage
         int32_t voltage = motor.getVoltage();
-        if (voltage != PROS_ERR_F) {
+        if (voltage != PROS_ERR) {
             pros::lcd::print(0, "Motor Voltage: %.2fV\n", voltage / 1000.0);
         }
         else {
@@ -39,7 +39,7 @@ namespace Catapult {
         }
         // Motor Position
         double position = motor.getPosition();
-        if (position != PROS_ERR_F) {
+        if (position != PROS_ERR) {
             pros::lcd::print(1, "Motor Position: %.1f\n", position);
         }
         else {
@@ -47,7 +47,7 @@ namespace Catapult {
         }
         // Motor Temperature
         double temperature = motor.getTemperature();
-        if (temperature != PROS_ERR_F) {
+        if (temperature != PROS_ERR) {
             pros::lcd::print(2, "Motor Temp: %.0fC\n", temperature);
         }
         else {
@@ -63,7 +63,7 @@ namespace Catapult {
         }
         pros::lcd::print(4, "\n");
         pros::lcd::print(5, "\n");
-        //pros::lcd::print(6, "\n");
+        pros::lcd::print(6, "\n");
     }
 
     double getPosition() {

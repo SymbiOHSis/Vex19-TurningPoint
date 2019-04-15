@@ -25,7 +25,7 @@ namespace BallIntake {
     void debug() {
         // Motor Voltage
         int32_t voltage = motor.getVoltage();
-        if (voltage != PROS_ERR_F) {
+        if (voltage != PROS_ERR) {
             pros::lcd::print(0, "Motor Voltage: %.2fV\n", voltage / 1000.0);
         }
         else {
@@ -33,7 +33,7 @@ namespace BallIntake {
         }
         // Motor Position
         double position = motor.getPosition();
-        if (position != PROS_ERR_F) {
+        if (position != PROS_ERR) {
             pros::lcd::print(1, "Motor Position: %.1f\n", position);
         }
         else {
@@ -41,15 +41,22 @@ namespace BallIntake {
         }
         // Motor Temperature
         double temperature = motor.getTemperature();
-        if (temperature != PROS_ERR_F) {
+        if (temperature != PROS_ERR) {
             pros::lcd::print(2, "Motor Temp: %.0fC\n", temperature);
         }
         else {
             pros::lcd::print(2, "Error fetching motor temp, errno: %d", errno);
         }
-        pros::lcd::print(3, "\n");
-        pros::lcd::print(4, "\n");
-        pros::lcd::print(5, "\n");
+        // Pot Position
+        int32_t value = ballDetector.get_value();
+        if (value != PROS_ERR) {
+            pros::lcd::print(3, "BallDetector Value: %d\n", value);
+        }
+        else {
+            pros::lcd::print(3, "Error fetching Detector value, errno: %d", errno);
+        }
+        pros::lcd::print(4, "Ball detected: %d (threshold: %d)\n", ballDetected(), BALL_DETECTOR_THRESHOLD);
+        pros::lcd::print(5, "Robot thinks there's a ball loaded: %d\n", ballIsLoaded());
         pros::lcd::print(6, "\n");
     }
 
@@ -71,6 +78,7 @@ namespace BallIntake {
 
     void loadBall() {
         loadingUntil = pros::millis() + BALL_FEED_TIME;
+        ballLoaded = true;
         start();
     }
 
@@ -79,13 +87,13 @@ namespace BallIntake {
             // loop at 100Hz
             pros::delay(10);
 
-            // don't control anything if not active
-            if (!active) continue;
-
             // catapult is up, assume no ball
             if (Catapult::getPosition() > CATAPULT_LOAD) {
                 ballLoaded = false;
             }
+
+            // don't control anything if not active
+            if (!active) continue;
 
             // ball is detected by sensor
             if (ballDetected()) {
