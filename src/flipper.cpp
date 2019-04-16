@@ -53,6 +53,12 @@
         return motor.getPosition();
     }
 
+    void waitUntilSettled() {
+        while (abs(motor.getTargetPosition() - motor.getPosition()) > 50) {
+            pros::delay(10);
+        }
+    }
+
     void run(void* param) {
         while (true) {
             // loop at 100Hz

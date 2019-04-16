@@ -10,7 +10,6 @@ namespace BallIntake {
 
     void start() {
         active = true;
-        motor.moveVoltage(12000 * BALL_INTAKE_SPEED);
     }
 
     void stop() {
@@ -47,7 +46,7 @@ namespace BallIntake {
         else {
             pros::lcd::print(2, "Error fetching motor temp, errno: %d", errno);
         }
-        // Pot Position
+        // Infrared Sensor
         int32_t value = ballDetector.get_value();
         if (value != PROS_ERR) {
             pros::lcd::print(3, "BallDetector Value: %d\n", value);
@@ -57,15 +56,11 @@ namespace BallIntake {
         }
         pros::lcd::print(4, "Ball detected: %d (threshold: %d)\n", ballDetected(), BALL_DETECTOR_THRESHOLD);
         pros::lcd::print(5, "Robot thinks there's a ball loaded: %d\n", ballIsLoaded());
-        pros::lcd::print(6, "\n");
+        pros::lcd::print(6, "Automatic control active: %d\n", active);
     }
 
     double getPosition() {
         return motor.getPosition();
-    }
-
-    void ballLoadedAtStartOfAuton(bool _ballLoaded) {
-        ballLoaded = _ballLoaded;
     }
 
     bool ballIsLoaded() {
@@ -88,7 +83,7 @@ namespace BallIntake {
             pros::delay(10);
 
             // catapult is up, assume no ball
-            if (Catapult::getPosition() > CATAPULT_LOAD) {
+            if (Catapult::isUp()) {
                 ballLoaded = false;
             }
 
@@ -98,7 +93,7 @@ namespace BallIntake {
             // ball is detected by sensor
             if (ballDetected()) {
                 // catapult is up, stop intake
-                if (Catapult::getPosition() > CATAPULT_LOAD) {
+                if (Catapult::isUp()) {
                     motor.moveVoltage(0);
                 }
                 else {
@@ -115,6 +110,10 @@ namespace BallIntake {
                         motor.moveVoltage(0);
                     }
                 }
+            }
+            // no ball detected, run intake
+            else {
+                motor.moveVoltage(12000 * BALL_INTAKE_SPEED);
             }
         }
     }

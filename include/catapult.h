@@ -10,6 +10,10 @@ namespace Catapult {
 
     bool isActive();
 
+    bool isUp();
+
+    bool isReadyToLoad();
+
     void debug();
 
     double getPosition();

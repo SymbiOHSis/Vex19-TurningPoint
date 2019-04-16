@@ -13,5 +13,7 @@ namespace Flipper {
 
     double getPosition();
 
+    void waitUntilSettled();
+
     void run(void* param);
 }

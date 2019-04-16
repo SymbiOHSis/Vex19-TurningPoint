@@ -28,6 +28,14 @@ namespace Catapult {
         return active;
     }
 
+    bool isUp() {
+        return getPosition() > CATAPULT_UP - CATAPULT_POT_THRESHOLD;
+    }
+
+    bool isReadyToLoad() {
+        return getPosition() < CATAPULT_LOAD + CATAPULT_POT_THRESHOLD;
+    }
+
     void debug() {
         // Motor Voltage
         int32_t voltage = motor.getVoltage();
@@ -101,7 +109,7 @@ namespace Catapult {
             // fire and reset
             else if (target == FIRE_RESET) {
                 // finished firing, start resetting
-                if (getPosition() > CATAPULT_UP) {
+                if (isUp()) {
                     target = RESET;
                 }
                 // keep firing
@@ -113,7 +121,7 @@ namespace Catapult {
             // fire
             else if (target == FIRE) {
                 // finished firing
-                if (getPosition() > CATAPULT_UP) {
+                if (isUp()) {
                     motor.moveVoltage(0);
                 }
                 // keep firing
@@ -124,13 +132,13 @@ namespace Catapult {
 
             // fire and reset
             else if (target == RESET) {
-                // drive down until at CATAPULT_LOAD
-                if (getPosition() > CATAPULT_LOAD) {
-                    motor.moveVoltage(12000 * CATAPULT_SPEED);
+                // stop if ready to load (no holding power because we have a ratchet)
+                if (isReadyToLoad()) {
+                    motor.moveVoltage(0);
                 }
-                // apply holding power
+                // drive down until ready to load
                 else {
-                    motor.moveVoltage(12000 * CATAPULT_HOLD_SPEED);
+                    motor.moveVoltage(12000 * CATAPULT_SPEED);
                 }
             }
         }
