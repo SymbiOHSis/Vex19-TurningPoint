@@ -42,6 +42,7 @@
 //#include "pros/api_legacy.h"
 
 #include "constants.h"
+#include "autonomous.h"
 #include "catapult.h"
 #include "ballIntake.h"
 #include "flipper.h"

@@ -9,6 +9,7 @@
 void initialize() {
 	pros::lcd::initialize();
 	pros::lcd::print(0, "9876543210    Initialized    0123456789");
+	Autonomous::initializeSelector();
 	Debug::initialize();
 }
 
