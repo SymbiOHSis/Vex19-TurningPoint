@@ -1,8 +1,6 @@
 #include "main.h"
 #define P   okapi::Point
 
-typedef void (*fp)();
-
 namespace Autonomous {
     int autonSelected = 0;
 
@@ -59,7 +57,7 @@ namespace Autonomous {
 
 	void initializeSelector() {
 		pros::lcd::register_btn1_cb(middleButtonCb);
-        pros::lcd::print(0, "Selected Auton: front red\n");
+        pros::lcd::print(0, "Selected Auton:\n");
         ctl.setText(0, 0, "Selected Auton\n");
     }
 
@@ -85,7 +83,7 @@ namespace Autonomous {
 
         // Generate some more paths
         profile.generatePath({P{0_in, 0_in, 0_deg}, P{12_in, 20_in, 90_deg}}, "capToFlip");
-        profile.generatePath({P{0_in, 0_in, 0_deg}, P{22_in, 26_in, 83_deg}}, "lineUpAgainstWall");
+        profile.generatePath({P{0_in, 0_in, 0_deg}, P{22_in, 26_in, 90_deg}}, "lineUpAgainstWall");
 
         // grab ball from cap
         profile.waitUntilSettled();
@@ -142,12 +140,9 @@ namespace Autonomous {
         profile.generatePath({P{0_in, 0_in, 0_deg}, P{30_in, 0_in, 0_deg}}, "capToGrabBallFrom");
         profile.setTarget("capToGrabBallFrom", 0);
 
-        // Generate rest of paths
-        profile.generatePath({P{0_in, 0_in, 0_deg}, P{12_in, -20_in, 90_deg}}, "capToFlip");
-        profile.generatePath({P{0_in, 0_in, 0_deg}, P{22_in, -26_in, 83_deg}}, "lineUpAgainstWall");
-        profile.generatePath({P{0_in, 0_in, 0_deg}, P{6_in, -6_in, 90_deg}}, "lineUpWithFlags");
-        profile.generatePath({P{0_in, 0_in, 0_deg}, P{27_in, 0_in, 0_deg}}, "advanceToMidFlag");
-        profile.generatePath({P{0_in, 0_in, 0_deg}, P{6_in, -2_in, 0_deg}}, "whackLowFlag");
+        // Generate some more paths
+        profile.generatePath({P{0_in, 0_in, 0_deg}, P{12_in, -20_in, -90_deg}}, "capToFlip");
+        profile.generatePath({P{0_in, 0_in, 0_deg}, P{22_in, -26_in, 95_deg}}, "lineUpAgainstWall");
 
         // grab ball from cap
         profile.waitUntilSettled();
@@ -164,8 +159,11 @@ namespace Autonomous {
         Flipper::motor.move_absolute(FLIPPER_UP, 200);
         Flipper::waitUntilSettled();
 
-        // line up against wall
+        // line up against wall while generating more paths
         profile.setTarget("lineUpAgainstWall", true);
+        profile.generatePath({P{0_in, 0_in, 0_deg}, P{9_in, -9_in, -100_deg}}, "lineUpWithFlags");
+        profile.generatePath({P{0_in, 0_in, 0_deg}, P{27_in, 0_in, 0_deg}}, "advanceToMidFlag");
+        profile.generatePath({P{0_in, 0_in, 0_deg}, P{6_in, -2_in, 0_deg}}, "whackLowFlag");
         profile.waitUntilSettled();
         driveTime(-0.4, 350);
 
