@@ -83,14 +83,26 @@ namespace Catapult {
         start();
     }
 
+    void fire() {
+        target = FIRE;
+        start();
+    }
+
     void reset() {
         target = RESET;
         start();
     }
 
-    void fire() {
-        target = FIRE;
-        start();
+    void waitUntilFired() {
+        while (target == FIRE || target == FIRE_RESET) {
+            pros::delay(10);
+        }
+    }
+
+    void waitUntilReset() {
+        while (!isReadyToLoad()) {
+            pros::delay(10);
+        }
     }
 
     void run(void* param) {

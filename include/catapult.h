@@ -24,5 +24,9 @@ namespace Catapult {
 
     void reset();
 
+    void waitUntilFired();
+
+    void waitUntilReset();
+
     void run(void* param);
 }

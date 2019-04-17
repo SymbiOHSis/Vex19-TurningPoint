@@ -16,18 +16,30 @@ auto profile = okapi::AsyncControllerFactory::motionProfile(
     drive // Chassis Controller
 );
 
-void frontAuton(bool red) {
+void driveTime(float speedLeft, float speedRight, int delayTime) {
+    drive.left(speedLeft);
+    drive.right(speedRight);
+    pros::delay(delayTime);
+    drive.left(0);
+    drive.right(0);
+}
+void driveTime(float speed, int delayTime) {
+    driveTime(speed, speed, delayTime);
+}
+
+void frontAutonRed() {
     BallIntake::start();
 
     // Generate first path
     profile.generatePath({okapi::Point{0_ft, 0_ft, 0_deg}, okapi::Point{30_in, 0_in, 0_deg}}, "capToGrabBallFrom");
-
     profile.setTarget("capToGrabBallFrom", 0);
 
     // Generate rest of paths
     profile.generatePath({okapi::Point{0_ft, 0_ft, 0_deg}, okapi::Point{12_in, 20_in, 90_deg}}, "capToFlip");
-    profile.generatePath({okapi::Point{0_ft, 0_ft, 0_deg}, okapi::Point{24_in, 20_in, 90_deg}}, "lineUpAgainstWall");
+    profile.generatePath({okapi::Point{0_ft, 0_ft, 0_deg}, okapi::Point{22_in, 26_in, 83_deg}}, "lineUpAgainstWall");
     profile.generatePath({okapi::Point{0_ft, 0_ft, 0_deg}, okapi::Point{6_in, 6_in, 90_deg}}, "lineUpWithFlags");
+    profile.generatePath({okapi::Point{0_ft, 0_ft, 0_deg}, okapi::Point{27_in, 0_in, 0_deg}}, "advanceToMidFlag");
+    profile.generatePath({okapi::Point{0_ft, 0_ft, 0_deg}, okapi::Point{6_in, 2_in, 0_deg}}, "whackLowFlag");
 
     // grab ball from cap
     profile.waitUntilSettled();
@@ -36,6 +48,7 @@ void frontAuton(bool red) {
     
     // lower flipper and move to front cap
     Flipper::motor.move_absolute(FLIPPER_DOWN, 200);
+    pros::delay(200);
     profile.setTarget("capToFlip", 0);
     profile.waitUntilSettled();
 
@@ -46,10 +59,31 @@ void frontAuton(bool red) {
     // line up against wall
     profile.setTarget("lineUpAgainstWall", true);
     profile.waitUntilSettled();
+    driveTime(-0.4, 350);
 
     // line up with flags
+    profile.moveTo({okapi::Point{0_ft, 0_ft, 0_deg}, okapi::Point{3_in, 0_in, 0_deg}});
     profile.setTarget("lineUpWithFlags");
     profile.waitUntilSettled();
+
+    // fire first ball
+    Catapult::fireAndReset();
+    Catapult::waitUntilFired();
+
+    // move forward to shoot mid flag
+    profile.setTarget("advanceToMidFlag");
+    profile.waitUntilSettled();
+
+    // fire second ball
+    pros::delay(1000); // massive delay to wait for ball to settle
+    Catapult::fireAndReset();
+    Catapult::waitUntilFired();
+
+    // move forward to whack low flag
+    profile.setTarget("whackLowFlag");
+    profile.waitUntilSettled();
+    Flipper::motor.move_absolute(FLIPPER_DOWN, 200);
+    Flipper::waitUntilSettled();
 }
 
 /**
@@ -67,10 +101,10 @@ void frontAuton(bool red) {
 void autonomous() {
     Debug::start();
 
-    //frontAuton(true);
+    frontAutonRed();
     
-    profile.generatePath({okapi::Point{0_ft, 0_ft, 0_deg}, okapi::Point{0_ft, 0_ft, 90_deg}}, "A");
-    profile.setTarget("A");
-    profile.waitUntilSettled();
+    //profile.generatePath({okapi::Point{0_ft, 0_ft, 0_deg}, okapi::Point{12_in, -12_in, 90_deg}}, "A");
+    //profile.setTarget("A");
+    //profile.waitUntilSettled();
     
 }
