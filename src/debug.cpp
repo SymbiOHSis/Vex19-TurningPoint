@@ -6,10 +6,22 @@
 
 	void backButtonCb() {
 		debug--;
+		clearLcd();
+
+		// if changing to auton selector, update lcd once
+		if (debug == 0) {
+			Autonomous::updateLcds();
+		}
 	}
 
 	void nextButtonCb() {
 		debug++;
+		clearLcd();
+
+		// if changing to auton selector, update lcd once
+		if (debug == 0) {
+			Autonomous::updateLcds();
+		}
 	}
 
 	void initialize() {

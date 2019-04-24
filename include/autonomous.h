@@ -2,6 +2,8 @@
 
 namespace Autonomous {
     void initializeSelector();
+
+    void updateLcds();
     
     void frontRed();
 

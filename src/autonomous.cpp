@@ -1,8 +1,10 @@
 #include "main.h"
+
 #define P   okapi::Point
 
 namespace Autonomous {
-    int autonSelected = 0;
+    const int NUM_AUTONS = 4;
+    int autonSelected = 2;
 
 	okapi::Controller ctl;
 
@@ -21,8 +23,10 @@ namespace Autonomous {
     );
 
     void runSelectedAuton() {
-        ctl.setText(0, 0, " Running Auton\n");
-        switch (autonSelected % 2) {
+        ctl.setText(0, 0, "Running Auton\n");
+        clearLcd();
+
+        switch (autonSelected % NUM_AUTONS) {
             case 0:
                 pros::lcd::print(0, "Running Auton: front red\n");
                 frontRed();
@@ -30,6 +34,35 @@ namespace Autonomous {
             case 1:
                 pros::lcd::print(0, "Running Auton: front blue\n");
                 frontBlue();
+                break;
+            case 2:
+                pros::lcd::print(0, "Running Auton: back red\n");
+                backRed();
+                break;
+            case 3:
+                pros::lcd::print(0, "Running Auton: back blue\n");
+                backBlue();
+                break;
+        }
+    }
+
+    void updateLcds() {
+        switch (autonSelected % NUM_AUTONS) {
+            case 0:
+                pros::lcd::print(0, "Selected Auton: front red\n");
+                ctl.setText(1, 0, "front  red\n");
+                break;
+            case 1:
+                pros::lcd::print(0, "Selected Auton: front blue\n");
+                ctl.setText(1, 0, "front blue\n");
+                break;
+            case 2:
+                pros::lcd::print(0, "Selected Auton: back red\n");
+                ctl.setText(1, 0, "back   red\n");
+                break;
+            case 3:
+                pros::lcd::print(0, "Selected Auton: back blue\n");
+                ctl.setText(1, 0, "back  blue\n");
                 break;
         }
     }
@@ -42,17 +75,7 @@ namespace Autonomous {
         }
 
         autonSelected++;
-
-        switch (autonSelected % 2) {
-            case 0:
-                pros::lcd::print(0, "Selected Auton: front red\n");
-                ctl.setText(1, 0, "front red\n");
-                break;
-            case 1:
-                pros::lcd::print(0, "Selected Auton: front blue\n");
-                ctl.setText(1, 0, "front blue\n");
-                break;
-        }
+        updateLcds();
 	}
 
 	void initializeSelector() {
@@ -61,6 +84,9 @@ namespace Autonomous {
         ctl.setText(0, 0, "Selected Auton\n");
     }
 
+    /*  Sets each drive side to SPEED for specified TIME
+        -1 <= SPEED <= 1
+        TIME is in millisecs  */
     void driveTime(float speedLeft, float speedRight, int delayTime) {
         drive.left(speedLeft);
         drive.right(speedRight);
@@ -72,7 +98,64 @@ namespace Autonomous {
         driveTime(speed, speed, delayTime);
     }
 
-    // Actual autonomous'
+    // Actual autonomous //
+    void backRed() {
+        BallIntake::start();
+
+        // Generate first path
+        profile.generatePath({P{0_in, 0_in, 0_deg}, P{30_in, 0_in, 0_deg}}, "capToGrabBallFrom");
+        profile.setTarget("capToGrabBallFrom", 0);
+
+        // Generate some more paths
+        profile.generatePath({P{0_in, 0_in, 0_deg}, P{30_in, -24_in, 0_deg}}, "capToFlip");
+
+        // grab ball from cap & reverse to starting position
+        profile.waitUntilSettled();
+        profile.setTarget("capToGrabBallFrom", true);
+        profile.waitUntilSettled();
+
+        // lower flipper and move to flat cap
+        Flipper::motor.move_absolute(FLIPPER_DOWN, 200);
+        pros::delay(200);
+        profile.setTarget("capToFlip");
+        profile.waitUntilSettled();
+
+        // flip flat cap
+        Flipper::motor.move_absolute(FLIPPER_UP, 200);
+        Flipper::waitUntilSettled();
+
+        // reverse away from cap
+        driveTime(-0.5, 500);
+    }
+    
+    void backBlue() {
+        BallIntake::start();
+
+        // Generate first path
+        profile.generatePath({P{0_in, 0_in, 0_deg}, P{30_in, 0_in, 0_deg}}, "capToGrabBallFrom");
+        profile.setTarget("capToGrabBallFrom", 0);
+        
+        // Generate some more paths
+        profile.generatePath({P{0_in, 0_in, 0_deg}, P{30_in, 24_in, 90_deg}}, "capToFlip");
+
+        // grab ball from cap & reverse to starting position
+        profile.waitUntilSettled();
+        profile.setTarget("capToGrabBallFrom", true);
+        profile.waitUntilSettled();
+
+        // lower flipper and move to flat cap
+        Flipper::motor.move_absolute(FLIPPER_DOWN, 200);
+        pros::delay(200);
+        profile.setTarget("capToFlip");
+        profile.waitUntilSettled();
+
+        // flip flat cap
+        Flipper::motor.move_absolute(FLIPPER_UP, 200);
+        Flipper::waitUntilSettled();
+
+        // reverse away from cap
+        driveTime(-0.5, 500);
+    }
 
     void frontRed() {
         BallIntake::start();
@@ -85,7 +168,7 @@ namespace Autonomous {
         profile.generatePath({P{0_in, 0_in, 0_deg}, P{12_in, 20_in, 90_deg}}, "capToFlip");
         profile.generatePath({P{0_in, 0_in, 0_deg}, P{22_in, 26_in, 90_deg}}, "lineUpAgainstWall");
 
-        // grab ball from cap
+        // grab ball from cap & reverse to starting position
         profile.waitUntilSettled();
         profile.setTarget("capToGrabBallFrom", true);
         profile.waitUntilSettled();
@@ -93,7 +176,7 @@ namespace Autonomous {
         // lower flipper and move to front cap
         Flipper::motor.move_absolute(FLIPPER_DOWN, 200);
         pros::delay(200);
-        profile.setTarget("capToFlip", 0);
+        profile.setTarget("capToFlip");
         profile.waitUntilSettled();
 
         // flip front cap
@@ -144,7 +227,7 @@ namespace Autonomous {
         profile.generatePath({P{0_in, 0_in, 0_deg}, P{12_in, -20_in, -90_deg}}, "capToFlip");
         profile.generatePath({P{0_in, 0_in, 0_deg}, P{22_in, -26_in, 95_deg}}, "lineUpAgainstWall");
 
-        // grab ball from cap
+        // grab ball from cap & reverse to starting position
         profile.waitUntilSettled();
         profile.setTarget("capToGrabBallFrom", true);
         profile.waitUntilSettled();
@@ -152,7 +235,7 @@ namespace Autonomous {
         // lower flipper and move to front cap
         Flipper::motor.move_absolute(FLIPPER_DOWN, 200);
         pros::delay(200);
-        profile.setTarget("capToFlip", 0);
+        profile.setTarget("capToFlip");
         profile.waitUntilSettled();
 
         // flip front cap

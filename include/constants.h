@@ -16,7 +16,7 @@
 #define BALL_INTAKE             15
 #define BALL_INTAKE_SPEED       1.0 // range -1 <= x <= 1
 #define BALL_DETECTOR           'C'
-#define BALL_DETECTOR_THRESHOLD 2000 // 2600 no ball
+#define BALL_DETECTOR_THRESHOLD 2500 // 2800 no ball
 #define BALL_FEED_TIME          300
 
 // Catapult

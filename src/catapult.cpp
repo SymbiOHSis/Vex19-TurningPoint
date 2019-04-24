@@ -69,9 +69,6 @@ namespace Catapult {
         else {
             pros::lcd::print(3, "Error fetching pot value, errno: %d", errno);
         }
-        pros::lcd::print(4, "\n");
-        pros::lcd::print(5, "\n");
-        pros::lcd::print(6, "\n");
     }
 
     double getPosition() {

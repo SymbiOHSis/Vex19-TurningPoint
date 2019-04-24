@@ -43,10 +43,6 @@ namespace Descorer {
         else {
             pros::lcd::print(2, "Error fetching motor temp, errno: %d", errno);
         }
-        pros::lcd::print(3, "\n");
-        pros::lcd::print(4, "\n");
-        pros::lcd::print(5, "\n");
-        pros::lcd::print(6, "\n");
     }
 
     double getPosition() {
