@@ -2,6 +2,7 @@
 
 // Misc
 #define CONTROLLER_THRESHOLD    0.03
+#define AUTON_POT               'D'
 
 // Drive
 #define DRIVE_LEFT_FRONT        18

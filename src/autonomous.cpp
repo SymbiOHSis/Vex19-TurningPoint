@@ -4,9 +4,10 @@
 
 namespace Autonomous {
     const int NUM_AUTONS = 4;
-    int autonSelected = 2;
+    int lastAutonDisplayed = -1;
 
 	okapi::Controller ctl;
+	pros::ADIPotentiometer pot (AUTON_POT);
 
     auto drive = okapi::ChassisControllerFactory::create(
         { DRIVE_LEFT_FRONT,  DRIVE_LEFT_BACK  },
@@ -22,66 +23,92 @@ namespace Autonomous {
         drive // Chassis Controller
     );
 
-    void runSelectedAuton() {
-        ctl.setText(0, 0, "Running Auton\n");
-        clearLcd();
+    int getSelectedAuton() {
+        int value = pot.get_value();
+        if (value <= 1096) {
+            return 0;
+        }
+        else if (1024 <= value && value <= 2048) {
+            return 1;
+        }
+        else if (2048 <= value && value <= 3072) {
+            return 2;
+        }
+        else if (3072 <= value) {
+            return 3;
+        }
+    }
 
-        switch (autonSelected % NUM_AUTONS) {
+    void runSelectedAuton() {
+        switch (getSelectedAuton()) {
             case 0:
-                pros::lcd::print(0, "Running Auton: front red\n");
                 frontRed();
                 break;
             case 1:
-                pros::lcd::print(0, "Running Auton: front blue\n");
                 frontBlue();
                 break;
             case 2:
-                pros::lcd::print(0, "Running Auton: back red\n");
                 backRed();
                 break;
             case 3:
-                pros::lcd::print(0, "Running Auton: back blue\n");
                 backBlue();
                 break;
         }
     }
 
-    void updateLcds() {
-        switch (autonSelected % NUM_AUTONS) {
-            case 0:
-                pros::lcd::print(0, "Selected Auton: front red\n");
-                ctl.setText(1, 0, "front  red\n");
-                break;
-            case 1:
-                pros::lcd::print(0, "Selected Auton: front blue\n");
-                ctl.setText(1, 0, "front blue\n");
-                break;
-            case 2:
-                pros::lcd::print(0, "Selected Auton: back red\n");
-                ctl.setText(1, 0, "back   red\n");
-                break;
-            case 3:
-                pros::lcd::print(0, "Selected Auton: back blue\n");
-                ctl.setText(1, 0, "back  blue\n");
-                break;
+    void debug() {
+        int selectedAuton = getSelectedAuton();
+
+        // Pot Position
+        int32_t value = pot.get_value();
+        if (value != PROS_ERR_F) {
+            pros::lcd::print(1, "Pot Value: %d\n", value);
         }
-    }
-    
-    // cycle through autons
-	void middleButtonCb() {
-        // not on auton selection screen
-        if (Debug::debug != 0) {
-            return;
+        else {
+            pros::lcd::print(1, "Error fetching pot value, errno: %d", errno);
         }
 
-        autonSelected++;
-        updateLcds();
-	}
+        // if pot close to an edge, 'hide' selection (to make the user move it to the correct place)
+        if (abs(value - 0) < 256 || abs(value - 1024) < 256 || abs(value - 2048) < 256 || abs(value - 3072) < 256 || abs(value - 4096) < 256) {
+            pros::lcd::print(0, "Selected Auton: TOO CLOSE TO EDGE\n");
+        }
+        else {
+            // update brain LCD
+            switch (selectedAuton) {
+                case 0:
+                    pros::lcd::print(0, "Selected Auton: front red\n");
+                    break;
+                case 1:
+                    pros::lcd::print(0, "Selected Auton: front blue\n");
+                    break;
+                case 2:
+                    pros::lcd::print(0, "Selected Auton: back red\n");
+                    break;
+                case 3:
+                    pros::lcd::print(0, "Selected Auton: back blue\n");
+                    break;
+            }
+        }
 
-	void initializeSelector() {
-		pros::lcd::register_btn1_cb(middleButtonCb);
-        pros::lcd::print(0, "Selected Auton:\n");
-        ctl.setText(0, 0, "Selected Auton\n");
+        // only update controller screen on change
+        if (lastAutonDisplayed != selectedAuton) {
+            lastAutonDisplayed = selectedAuton;
+
+            switch (selectedAuton) {
+                case 0:
+                    ctl.setText(0, 0, "front  red\n");
+                    break;
+                case 1:
+                    ctl.setText(0, 0, "front blue\n");
+                    break;
+                case 2:
+                    ctl.setText(0, 0, "back   red\n");
+                    break;
+                case 3:
+                    ctl.setText(0, 0, "back  blue\n");
+                    break;
+            }
+        }
     }
 
     /*  Sets each drive side to SPEED for specified TIME

@@ -7,21 +7,11 @@
 	void backButtonCb() {
 		debug--;
 		clearLcd();
-
-		// if changing to auton selector, update lcd once
-		if (debug == 0) {
-			Autonomous::updateLcds();
-		}
 	}
 
 	void nextButtonCb() {
 		debug++;
 		clearLcd();
-
-		// if changing to auton selector, update lcd once
-		if (debug == 0) {
-			Autonomous::updateLcds();
-		}
 	}
 
 	void initialize() {
@@ -40,15 +30,15 @@
 
     void run(void* param) {
         while (true) {
-            // loop at 100Hz
-            pros::delay(10);
+            // loop at 50Hz
+            pros::delay(20);
 
             // don't control anything if not active
             if (!active) continue;
 
             switch (debug % 5) {
 				case 0:
-					// Autonomous does it's own thing
+					Autonomous::debug();
 					pros::lcd::print(7, "  <<<<<    Selecting:  Autonomous  >>>>>  \n");
 					break;
 				case 1:

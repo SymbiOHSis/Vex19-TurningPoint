@@ -1,9 +1,11 @@
 #pragma once
 
 namespace Autonomous {
+    extern pros::ADIPotentiometer pot;
+    
     void initializeSelector();
 
-    void updateLcds();
+    void debug();
     
     void frontRed();
 
