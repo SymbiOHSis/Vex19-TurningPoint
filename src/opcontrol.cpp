@@ -1,5 +1,19 @@
 #include "main.h"
 
+#define DESCORER_HEIGHT	-400
+
+/* CONTROLLER VIBRATION */
+void rumbleAlerts(void* param) {
+	okapi::Controller ctl;
+	uint32_t now = pros::millis();
+
+	pros::Task::delay_until(&now, 75000);
+	ctl.rumble("..");
+
+	pros::Task::delay_until(&now, 20000);
+	ctl.rumble("..");
+}
+
 /**
  * Runs the operator control code. This function will be started in its own task
  * with the default priority and stack size whenever the robot is enabled via
@@ -26,6 +40,8 @@ void opcontrol() {
 	Flipper::stop();
 	Descorer::stop();
 	Debug::start();
+
+	pros::Task task (rumbleAlerts);
 
 	while (true) {
 		/* DRIVE */
@@ -78,8 +94,16 @@ void opcontrol() {
 		}
 
 		/* DESCORER */
-		int direction = ctl.getDigital(okapi::ControllerDigital::R1) - ctl.getDigital(okapi::ControllerDigital::R2);
-		Descorer::motor.moveVoltage(direction * 12000 * DESCORER_SPEED);
+		//int direction = ctl.getDigital(okapi::ControllerDigital::R1) - ctl.getDigital(okapi::ControllerDigital::R2);
+		//Descorer::motor.moveVoltage(direction * 12000 * DESCORER_SPEED);
+
+		// R2 gets into position, R1 descores and puts away descorer
+		if (ctl.getDigital(okapi::ControllerDigital::R1)) {
+			Descorer::motor.moveAbsolute(0, 200);
+		}
+		else if (ctl.getDigital(okapi::ControllerDigital::R2)) {
+			Descorer::motor.moveAbsolute(DESCORER_HEIGHT, 200);
+		}
 
 		/* DEBUG */
 		// already started

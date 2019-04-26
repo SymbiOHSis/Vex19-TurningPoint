@@ -43,6 +43,15 @@ namespace Descorer {
         else {
             pros::lcd::print(2, "Error fetching motor temp, errno: %d", errno);
         }
+        // Motor Target Position
+        double target = motor.getTargetPosition();
+        if (position != PROS_ERR) {
+            pros::lcd::print(3, "Motor Target Position: %.1f\n", target);
+        }
+        else {
+            pros::lcd::print(3, "Error fetching motor position, errno: %d", errno);
+        }
+
     }
 
     double getPosition() {
