@@ -7,11 +7,6 @@ namespace Autonomous {
 
     void debug();
     
-    void frontRed();
-
-    void frontBlue();
-
-    void backRed();
-
-    void backBlue();
+    void runSelectedAuton();
+    
 }

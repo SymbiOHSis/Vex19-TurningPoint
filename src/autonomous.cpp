@@ -3,8 +3,16 @@
 #define P   okapi::Point
 
 namespace Autonomous {
+    const bool PARK = false;
     const int NUM_AUTONS = 4;
     int lastAutonDisplayed = -1;
+
+    enum {
+        FRONT_RED,
+        FRONT_BLUE,
+        BACK_RED,
+        BACK_BLUE
+    };
 
 	okapi::Controller ctl;
 	pros::ADIPotentiometer pot (AUTON_POT);
@@ -25,34 +33,18 @@ namespace Autonomous {
 
     int getSelectedAuton() {
         int value = pot.get_value();
+
         if (value <= 1096) {
-            return 0;
+            return FRONT_RED;
         }
         else if (1024 <= value && value <= 2048) {
-            return 1;
+            return FRONT_BLUE;
         }
         else if (2048 <= value && value <= 3072) {
-            return 2;
+            return BACK_RED;
         }
         else if (3072 <= value) {
-            return 3;
-        }
-    }
-
-    void runSelectedAuton() {
-        switch (getSelectedAuton()) {
-            case 0:
-                frontRed();
-                break;
-            case 1:
-                frontBlue();
-                break;
-            case 2:
-                backRed();
-                break;
-            case 3:
-                backBlue();
-                break;
+            return BACK_BLUE;
         }
     }
 
@@ -75,16 +67,16 @@ namespace Autonomous {
         else {
             // update brain LCD
             switch (selectedAuton) {
-                case 0:
+                case FRONT_RED:
                     pros::lcd::print(0, "Selected Auton: front red\n");
                     break;
-                case 1:
+                case FRONT_BLUE:
                     pros::lcd::print(0, "Selected Auton: front blue\n");
                     break;
-                case 2:
+                case BACK_RED:
                     pros::lcd::print(0, "Selected Auton: back red\n");
                     break;
-                case 3:
+                case BACK_BLUE:
                     pros::lcd::print(0, "Selected Auton: back blue\n");
                     break;
             }
@@ -95,16 +87,16 @@ namespace Autonomous {
             lastAutonDisplayed = selectedAuton;
 
             switch (selectedAuton) {
-                case 0:
+                case FRONT_RED:
                     ctl.setText(0, 0, "front  red\n");
                     break;
-                case 1:
+                case FRONT_BLUE:
                     ctl.setText(0, 0, "front blue\n");
                     break;
-                case 2:
+                case BACK_RED:
                     ctl.setText(0, 0, "back   red\n");
                     break;
-                case 3:
+                case BACK_BLUE:
                     ctl.setText(0, 0, "back  blue\n");
                     break;
             }
@@ -135,6 +127,7 @@ namespace Autonomous {
 
         // Generate some more paths
         profile.generatePath({P{0_in, 0_in, 0_deg}, P{30_in, -24_in, 0_deg}}, "capToFlip");
+        profile.generatePath({P{0_in, 0_in, 0_deg}, P{12_in, 24_in, 0_deg}, P{36_in, 24_in, 0_deg}}, "park");
 
         // grab ball from cap & reverse to starting position
         profile.waitUntilSettled();
@@ -147,12 +140,17 @@ namespace Autonomous {
         profile.setTarget("capToFlip");
         profile.waitUntilSettled();
 
-        // flip flat cap
+        // flip flat cap & reverse to starting position
         Flipper::motor.move_absolute(FLIPPER_UP, 200);
         Flipper::waitUntilSettled();
+        profile.setTarget("capToFlip", true);
+        profile.waitUntilSettled();
 
-        // reverse away from cap
-        driveTime(-0.5, 500);
+        // park
+        if (PARK) {
+            profile.setTarget("park");
+            profile.waitUntilSettled();
+        }
     }
     
     void backBlue() {
@@ -163,7 +161,8 @@ namespace Autonomous {
         profile.setTarget("capToGrabBallFrom", 0);
         
         // Generate some more paths
-        profile.generatePath({P{0_in, 0_in, 0_deg}, P{30_in, 24_in, 90_deg}}, "capToFlip");
+        profile.generatePath({P{0_in, 0_in, 0_deg}, P{30_in, 22_in, 0_deg}}, "capToFlip");
+        profile.generatePath({P{0_in, 0_in, 0_deg}, P{12_in, -24_in, 0_deg}, P{36_in, -24_in, 0_deg}}, "park");
 
         // grab ball from cap & reverse to starting position
         profile.waitUntilSettled();
@@ -176,12 +175,17 @@ namespace Autonomous {
         profile.setTarget("capToFlip");
         profile.waitUntilSettled();
 
-        // flip flat cap
+        // flip flat cap & reverse to starting position
         Flipper::motor.move_absolute(FLIPPER_UP, 200);
         Flipper::waitUntilSettled();
+        profile.setTarget("capToFlip", true);
+        profile.waitUntilSettled();
 
-        // reverse away from cap
-        driveTime(-0.5, 500);
+        // park
+        if (PARK) {
+            profile.setTarget("park");
+            profile.waitUntilSettled();
+        }
     }
 
     void frontRed() {
@@ -300,6 +304,34 @@ namespace Autonomous {
         profile.waitUntilSettled();
         Flipper::motor.move_absolute(FLIPPER_DOWN, 200);
         Flipper::waitUntilSettled();
+    }
+
+    void runSelectedAuton() {
+        // sometimes pot value is zero, wait for it to be ready (1sec timeout)
+        uint32_t timeout = pros::millis() + 1000;
+        while (pot.get_value() == 0 && pros::millis() < timeout) {
+            pros::delay(10);
+        }
+
+        int selectedAuton = getSelectedAuton();
+        pros::lcd::print(4, "Actual auton running: %d\n", selectedAuton);
+        pros::lcd::print(5, "Current pot: %d\n", pot.get_value());
+        debug();
+
+        switch (selectedAuton) {
+            case FRONT_RED:
+                frontRed();
+                break;
+            case FRONT_BLUE:
+                frontBlue();
+                break;
+            case BACK_RED:
+                backRed();
+                break;
+            case BACK_BLUE:
+                backBlue();
+                break;
+        }
     }
 }
 
