@@ -1,9 +1,10 @@
 #include "main.h"
 
 #define P   okapi::Point
+#define FLIP_CAP_VELOCITY 160
 
 namespace Autonomous {
-    const bool PARK = false;
+    const bool PARK = true;
     const int NUM_AUTONS = 4;
     int lastAutonDisplayed = -1;
 
@@ -82,8 +83,8 @@ namespace Autonomous {
             }
         }
 
-        // only update controller screen on change
-        if (lastAutonDisplayed != selectedAuton) {
+        // pot returns 0 when uninitialized. only update controller screen on change
+        if (value != 0 && lastAutonDisplayed != selectedAuton) {
             lastAutonDisplayed = selectedAuton;
 
             switch (selectedAuton) {
@@ -127,7 +128,8 @@ namespace Autonomous {
 
         // Generate some more paths
         profile.generatePath({P{0_in, 0_in, 0_deg}, P{30_in, -24_in, 0_deg}}, "capToFlip");
-        profile.generatePath({P{0_in, 0_in, 0_deg}, P{12_in, 24_in, 0_deg}, P{36_in, 24_in, 0_deg}}, "park");
+        profile.generatePath({P{0_in, 0_in, 0_deg}, P{36_in, 24_in, 0_deg}}, "capToFlipReverse");
+        profile.generatePath({P{0_in, 0_in, 0_deg}, P{20_in, 26_in, 0_deg}}, "park");
 
         // grab ball from cap & reverse to starting position
         profile.waitUntilSettled();
@@ -140,16 +142,19 @@ namespace Autonomous {
         profile.setTarget("capToFlip");
         profile.waitUntilSettled();
 
-        // flip flat cap & reverse to starting position
-        Flipper::motor.move_absolute(FLIPPER_UP, 200);
+        // flip flat cap & reverse to wall
+        Flipper::motor.move_absolute(FLIPPER_UP, FLIP_CAP_VELOCITY);
         Flipper::waitUntilSettled();
-        profile.setTarget("capToFlip", true);
+        profile.setTarget("capToFlipReverse", true);
         profile.waitUntilSettled();
+        driveTime(-0.3, 400);
 
         // park
         if (PARK) {
             profile.setTarget("park");
             profile.waitUntilSettled();
+            driveTime(0.3, 400);
+            driveTime(1, 2000);
         }
     }
     
@@ -161,8 +166,9 @@ namespace Autonomous {
         profile.setTarget("capToGrabBallFrom", 0);
         
         // Generate some more paths
-        profile.generatePath({P{0_in, 0_in, 0_deg}, P{30_in, 22_in, 0_deg}}, "capToFlip");
-        profile.generatePath({P{0_in, 0_in, 0_deg}, P{12_in, -24_in, 0_deg}, P{36_in, -24_in, 0_deg}}, "park");
+        profile.generatePath({P{0_in, 0_in, 0_deg}, P{30_in, 19_in, 0_deg}}, "capToFlip");
+        profile.generatePath({P{0_in, 0_in, 0_deg}, P{36_in, -19_in, 0_deg}}, "capToFlipReverse");
+        profile.generatePath({P{0_in, 0_in, 0_deg}, P{20_in, -36_in, 0_deg}}, "park");
 
         // grab ball from cap & reverse to starting position
         profile.waitUntilSettled();
@@ -175,16 +181,19 @@ namespace Autonomous {
         profile.setTarget("capToFlip");
         profile.waitUntilSettled();
 
-        // flip flat cap & reverse to starting position
-        Flipper::motor.move_absolute(FLIPPER_UP, 200);
+        // flip flat cap & reverse to wall
+        Flipper::motor.move_absolute(FLIPPER_UP, FLIP_CAP_VELOCITY);
         Flipper::waitUntilSettled();
-        profile.setTarget("capToFlip", true);
+        profile.setTarget("capToFlipReverse", true);
         profile.waitUntilSettled();
+        driveTime(-0.3, 400);
 
         // park
         if (PARK) {
             profile.setTarget("park");
             profile.waitUntilSettled();
+            driveTime(0.3, 400);
+            driveTime(1, 1700);
         }
     }
 
@@ -196,8 +205,8 @@ namespace Autonomous {
         profile.setTarget("capToGrabBallFrom", 0);
 
         // Generate some more paths
-        profile.generatePath({P{0_in, 0_in, 0_deg}, P{12_in, 20_in, 90_deg}}, "capToFlip");
-        profile.generatePath({P{0_in, 0_in, 0_deg}, P{22_in, 26_in, 90_deg}}, "lineUpAgainstWall");
+        profile.generatePath({P{0_in, 0_in, 0_deg}, P{12_in, 16_in, 90_deg}}, "capToFlip");
+        profile.generatePath({P{0_in, 0_in, 0_deg}, P{14_in, 26_in, -93_deg}}, "lineUpAgainstWall");
 
         // grab ball from cap & reverse to starting position
         profile.waitUntilSettled();
@@ -211,16 +220,17 @@ namespace Autonomous {
         profile.waitUntilSettled();
 
         // flip front cap
-        Flipper::motor.move_absolute(FLIPPER_UP, 200);
+        Flipper::motor.move_absolute(FLIPPER_UP, FLIP_CAP_VELOCITY);
         Flipper::waitUntilSettled();
 
         // line up against wall while generating more paths
         profile.setTarget("lineUpAgainstWall", true);
         profile.generatePath({P{0_in, 0_in, 0_deg}, P{6_in, 6_in, 90_deg}}, "lineUpWithFlags");
         profile.generatePath({P{0_in, 0_in, 0_deg}, P{27_in, 0_in, 0_deg}}, "advanceToMidFlag");
-        profile.generatePath({P{0_in, 0_in, 0_deg}, P{6_in, 2_in, 0_deg}}, "whackLowFlag");
+        profile.generatePath({P{0_in, 0_in, 0_deg}, P{6_in, 3_in, 0_deg}}, "whackLowFlag");
         profile.waitUntilSettled();
-        driveTime(-0.4, 350);
+        pros::delay(500);
+        driveTime(-0.3, -0.5, 800);
 
         // line up with flags
         profile.moveTo({P{0_in, 0_in, 0_deg}, P{3_in, 0_in, 0_deg}});
@@ -255,8 +265,8 @@ namespace Autonomous {
         profile.setTarget("capToGrabBallFrom", 0);
 
         // Generate some more paths
-        profile.generatePath({P{0_in, 0_in, 0_deg}, P{12_in, -20_in, -90_deg}}, "capToFlip");
-        profile.generatePath({P{0_in, 0_in, 0_deg}, P{22_in, -26_in, 95_deg}}, "lineUpAgainstWall");
+        profile.generatePath({P{0_in, 0_in, 0_deg}, P{12_in, -16_in, -90_deg}}, "capToFlip");
+        profile.generatePath({P{0_in, 0_in, 0_deg}, P{16_in, -26_in, 95_deg}}, "lineUpAgainstWall");
 
         // grab ball from cap & reverse to starting position
         profile.waitUntilSettled();
@@ -270,16 +280,16 @@ namespace Autonomous {
         profile.waitUntilSettled();
 
         // flip front cap
-        Flipper::motor.move_absolute(FLIPPER_UP, 200);
+        Flipper::motor.move_absolute(FLIPPER_UP, FLIP_CAP_VELOCITY);
         Flipper::waitUntilSettled();
 
         // line up against wall while generating more paths
         profile.setTarget("lineUpAgainstWall", true);
         profile.generatePath({P{0_in, 0_in, 0_deg}, P{9_in, -9_in, -100_deg}}, "lineUpWithFlags");
         profile.generatePath({P{0_in, 0_in, 0_deg}, P{27_in, 0_in, 0_deg}}, "advanceToMidFlag");
-        profile.generatePath({P{0_in, 0_in, 0_deg}, P{6_in, -2_in, 0_deg}}, "whackLowFlag");
+        profile.generatePath({P{0_in, 0_in, 0_deg}, P{6_in, -4_in, 0_deg}}, "whackLowFlag");
         profile.waitUntilSettled();
-        driveTime(-0.4, 350);
+        driveTime(-0.25, 700);
 
         // line up with flags
         profile.moveTo({P{0_in, 0_in, 0_deg}, P{3_in, 0_in, 0_deg}});
@@ -314,8 +324,6 @@ namespace Autonomous {
         }
 
         int selectedAuton = getSelectedAuton();
-        pros::lcd::print(4, "Actual auton running: %d\n", selectedAuton);
-        pros::lcd::print(5, "Current pot: %d\n", pot.get_value());
         debug();
 
         switch (selectedAuton) {
